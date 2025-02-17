@@ -30,8 +30,8 @@ class World():
     
 
     def load_tiles(self, level, TILE_SIZE):
-        for x, row in enumerate(level):
-            for y, tile in enumerate(row):
+        for y, row in enumerate(level):
+            for x, tile in enumerate(row):
                 if tile == "1":
                     img = pg.transform.scale(self.dirtImg, (TILE_SIZE, TILE_SIZE))
                     imgRect = img.get_rect()
