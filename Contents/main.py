@@ -17,7 +17,7 @@ screen = Screen(1280, 720)
 pg.display.set_caption("Cave of Malice v0.0.0 - alpha")
 clock = pg.time.Clock()
 
-player = Player(0, 550, 120, 120, 5, 2, "Assets/player.png", None, 1, 20)
+player = Player(100, 572, 45, 100, 5, 2, "Assets/player.png", None, 1, -20, 10)
 
 font = pg.font.Font(None, 36)
 startupFont = pg.font.Font(None, 56)
@@ -33,7 +33,7 @@ currentPage = "start_animation"
 
 FPS = 30
 
-enemy1 = Enemy("Spider", 200, 550, 120, 120, 3, 2, "Assets/player.png", 1)
+enemy1 = Enemy("Spider", 200, 572, 45, 100, 3, 2, "Assets/player.png", 1)
 
 enemies = []
 running = True
@@ -71,7 +71,7 @@ def start_animation():
 
 def game():
     global running
-    world.load_tiles(level, TILE_SIZE)
+    world.load_tiles(level)
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -81,8 +81,8 @@ def game():
         SCREEN.fill((150, 150, 150))
 
         # Move character
-        player.move(world.tileList)
-        enemy1.move(0, 500)
+        player.move(world.tileList, SCREEN)
+        enemy1.move(32, 500)
 
 
         # Detect collision
@@ -99,8 +99,7 @@ def game():
         player.draw(SCREEN)
         enemy1.draw(SCREEN)
         # Display blocks
-        world.draw_map(level, TILE_SIZE, SCREEN)
-        player.collision(world.tileList)
+        world.draw_map(SCREEN)
 
         clock.tick(FPS)
         pg.display.update()
@@ -108,10 +107,11 @@ def game():
 def main():
     global currentPage
     while True:
-        if currentPage == "start_animation":
-            currentPage = start_animation()
-        if currentPage == "game":
-            currentPage = game()
+        # if currentPage == "start_animation":
+        #     currentPage = start_animation()
+        # if currentPage == "game":
+        #     currentPage = game()
+        game()
 
 if __name__ == "__main__":
     main()

@@ -8,6 +8,7 @@ class World():
         self.lavaImg = pg.transform.scale(self.lavaImg, (TILE_SIZE, TILE_SIZE))
 
         self.tileList = []
+        self.TILE_SIZE = TILE_SIZE
 
 
     def load_map(self, mapName):
@@ -20,31 +21,17 @@ class World():
             return 0
     
 
-    def draw_map(self, level, TILE_SIZE, SCREEN):
-        for x, row in enumerate(level):
-            for y, tile in enumerate(row):
-                if tile == "1":
-                    SCREEN.blit(self.dirtImg, (y * TILE_SIZE, x * TILE_SIZE))
-                if tile == "2":
-                    SCREEN.blit(self.lavaImg, (y * TILE_SIZE, x * TILE_SIZE))
+    def draw_map(self, SCREEN):
+        for tile in self.tileList:
+            SCREEN.blit(tile[0], tile[1])
     
 
-    def load_tiles(self, level, TILE_SIZE):
-        for y, row in enumerate(level):
-            for x, tile in enumerate(row):
-                if tile == "1":
-                    img = pg.transform.scale(self.dirtImg, (TILE_SIZE, TILE_SIZE))
-                    imgRect = img.get_rect()
-                    imgRect.x = x * TILE_SIZE
-                    imgRect.y = y * TILE_SIZE
-                    tile = (img, imgRect)
-                    print(tile[1])
-                    self.tileList.append(tile)
-                if tile == "2":
-                    img = pg.transform.scale(self.lavaImg, (TILE_SIZE, TILE_SIZE))
-                    imgRect = img.get_rect()
-                    imgRect.x = x * TILE_SIZE
-                    imgRect.y = y * TILE_SIZE
+    def load_tiles(self, level):
+        self.tileList = []
+        for row_index, row in enumerate(level):
+            for col_index, tile in enumerate(row):
+                if tile == "1" or tile == "2":
+                    img = pg.transform.scale(self.dirtImg if tile == "1" else self.lavaImg, (self.TILE_SIZE, self.TILE_SIZE))
+                    imgRect = pg.Rect(col_index * self.TILE_SIZE, row_index * self.TILE_SIZE, self.TILE_SIZE, self.TILE_SIZE)
                     tile = (img, imgRect)
                     self.tileList.append(tile)
-

@@ -1,7 +1,7 @@
 import pygame as pg
 
 class Player():
-    def __init__(self, x, y, width, height, speed, health, sourceImage, footY, gravity, jumpPower):
+    def __init__(self, x, y, width, height, speed, health, sourceImage, footY, gravity, jumpPower, sidePadding):
         self.x = x
         self.y = y
         self.width = width
@@ -14,7 +14,7 @@ class Player():
         self.gravity = gravity
         self.jumpPower = jumpPower
 
-        self.rightX = self.x + self.width
+        self.sidePadding = sidePadding
 
 
         self.jumping = False
@@ -29,10 +29,8 @@ class Player():
         self.image = pg.image.load(self.sourceImage)
         self.image = pg.transform.scale(self.image, (self.width, self.height))
 
-        self.rect = self.image.get_rect()
-        self.rect.x = self.x
-        self.rect.y = self.y
         self.mask = pg.mask.from_surface(self.image)
+        self.rect = self.mask.get_rect()
 
 
     def check_walk(self):
@@ -52,54 +50,105 @@ class Player():
     
 
     def jump(self):
-        # print(self.y, self.yChange)
         self.y -= self.yChange
         self.yChange -= self.gravity
-        # self.footY = self.y + self.height
-        # print(self.y, self.yChange)
+    
 
+    def collision(self, tileList, SCREEN):
+        collided = False
+        self.rect.x = self.x
+        self.rect.y = self.y
 
-    def collision(self, tileList):
-        playerYRect = pg.Rect(self.x, self.y + self.yChange, self.width, self.height)
-        playerXRect = pg.Rect(self.x + self.xChange, self.y, self.width, self.height)
-
-        if pg.Rect.colliderect(playerXRect, tileList[1][1]):
-            print("we did it again!")
+        self.rect.y += self.yChange
         for tile in tileList:
-            if pg.Rect.colliderect(playerXRect, tile[1]):
-                self.xChange = 0
-            # print('tile[1]: ', tile[1])
-            # print(self.rect.x, self.rect.y + self.yChange, self.width, self.height)
-            if pg.Rect.colliderect(playerYRect, tile[1]):
-                if self.yChange < 0:
-                    self.y = tile[1].top - self.height
+            if self.rect.colliderect(tile[1]):
+                collided = True
+                if self.yChange > 0:    # Moving down
+                    self.rect.bottom = tile[1].top
+                    self.y = self.rect.y
+                    self.yChange = 0
                     self.on_ground = True
+                elif self.yChange < 0:  # Moving up
+                    self.rect.top = tile[1].bottom
+                    self.y = self.rect.y
                     self.yChange = 0
-                    return True
-                elif self.yChange > 0:
-                    self.y = tile[1].bottom
-                    self.yChange = 0
-        return self.on_ground
+        
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        self.rect.x += self.xChange
+        for tile in tileList:
+            if self.rect.colliderect(tile[1]):
+                if self.xChange > 0:    # Moving right
+                    self.rect.right = tile[1].left
+                    self.x = self.rect.x
+                    self.xChange = 0
+                    self.on_ground = True
+                elif self.xChange < 0:  # Moving left
+                    self.rect.left = tile[1].right
+                    self.x = self.rect.x
+                self.xChange = 0
+        
+        self.rect.x = self.x
+        self.rect.y = self.y
+
+        return collided
+
+
+
+    # def collision1(self, tileList):
+    #     playerYRect = pg.Rect(self.x, self.y + self.yChange, self.width, self.height)
+    #     playerRightXRect = pg.Rect(self.x + self.xChange, self.y + self.sidePadding, self.width - (self.sidePadding * 2), self.height)
+    #     playerLeftXRect = pg.Rect(self.x - self.xChange, self.y + self.sidePadding, self.width - (self.sidePadding * 2), self.height)
+
+    #     if self.yChange < -22:
+    #         for tile in tileList:
+    #             # if pg.Rect.colliderect(playerYRect, tile[1]):
+    #                 print(pg.Rect.colliderect(playerRightXRect, tile[1]))
+    #                 print(pg.Rect.colliderect(playerYRect, tile[1]))
+    #                 print(self.yChange)
+    #                 print(self.y)
+    #                 print(tile[1])
+    #                 print("")
+
+    #     for tile in tileList:
+    #         if pg.Rect.colliderect(playerRightXRect, tile[1]) | pg.Rect.colliderect(playerLeftXRect, tile[1]):
+    #             self.xChange = 0
+    #         if pg.Rect.colliderect(playerYRect, tile[1]):
+    #             if self.yChange < 0:
+    #                 print("OK")
+    #                 self.y = tile[1].top - self.height
+    #                 self.on_ground = True
+    #                 self.yChange = 0
+    #             elif self.yChange > 0:
+    #                 self.y = tile[1].bottom
+    #                 self.yChange = 0
+    #     return self.on_ground
     
 
 
-    def move(self, tileList):
-        self.check_walk()
+    def move(self, tileList, SCREEN):
+        if not self.collision(tileList, SCREEN):
+            self.on_ground = False
 
         if self.xChange != 0:
             self.x += self.xChange
-            self.rightX = self.x + self.width
             self.xChange = 0
+        self.y += self.yChange
+
         
-        # Jump logic
-        self.jump()
+
+        self.check_walk()
+        if not self.on_ground:
+            self.yChange += self.gravity
+
+        # print(self.y, self.yChange)
+        # self.jump()
+        # print(self.y, self.yChange)
 
         self.rect.x = self.x
         self.rect.y = self.y
         
-        if self.collision(tileList):
-            self.yChange = 0
-            self.on_ground = True
 
 
     def draw(self, screen):
@@ -108,8 +157,10 @@ class Player():
 
     def check_collision(self, enemies):
         for enemy in enemies:
-            offsetX = enemy.x - self.x
-            offsetY = enemy.y - self.y
-            if self.mask.overlap(enemy.mask, (offsetX, offsetY)):
-                return True
+            enemy_rect = pg.Rect(enemy.x, enemy.y, enemy.width, enemy.height)
+            if self.rect.colliderect(enemy_rect):
+                offsetX = int(enemy.x - self.x)
+                offsetY = int(enemy.y - self.y)
+                if self.mask.overlap(enemy.mask, (offsetX, offsetY)):
+                    return True
         return False
