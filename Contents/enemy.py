@@ -10,7 +10,6 @@ class Enemy():
         self.speed = speed
         self.health = health
 
-
         self.direction = direction
 
         self.sourceImage = sourceImage

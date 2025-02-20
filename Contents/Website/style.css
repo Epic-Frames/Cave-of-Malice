@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Tiny5&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Tiny5&display=swap');
+
+*{
+    font-family: "Pixelify Sans", serif;
+    /* font-family: "Tiny5", serif; */
+}
+
+:root{
+    --main-color: #25ced1;
+    --secondary-color: #996b26;
+    --third-color: #fceade;
+}
+
+body {
+    margin: 0;
+}
+
+.everything{
+    margin-left: 1rem;
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    background-color: var(--main-color);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin: 20px;
+}
+
+#text-1 {
+    border: 1px solid rgb(0, 94, 255);
+    display: inline-block;
+    width: 250px;
+    margin: 15px 0px 0px 15px;
+}
+
+.title{
+    text-align: center;
+    background-color: var(--third-color);
+    padding: 1rem;
+    margin: 0px;
+}
+
+.navbar{
+    display: flex;
+    justify-content: center;
+    background-color: var(--third-color);
+    padding: 0;
+}
+
+.logo {
+    border: 2px solid red;
+    padding: 100px;
+}

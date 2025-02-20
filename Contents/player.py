@@ -49,13 +49,10 @@ class Player():
             self.on_ground = False
     
 
-    def jump(self):
-        self.y -= self.yChange
-        self.yChange -= self.gravity
-    
-
-    def collision(self, tileList, SCREEN):
+    def collision(self, tileList):
         collided = False
+        ifDead = False
+        ifWin = False
         self.rect.x = self.x
         self.rect.y = self.y
 
@@ -63,6 +60,10 @@ class Player():
         for tile in tileList:
             if self.rect.colliderect(tile[1]):
                 collided = True
+                if tile[2] == "Assets/lava.jpeg":
+                    ifDead = True
+                if tile[2] == "Assets/diamond.png":
+                    ifWin = True
                 if self.yChange > 0:    # Moving down
                     self.rect.bottom = tile[1].top
                     self.y = self.rect.y
@@ -79,6 +80,10 @@ class Player():
         self.rect.x += self.xChange
         for tile in tileList:
             if self.rect.colliderect(tile[1]):
+                if tile[2] == "Assets/lava.jpeg":
+                    ifDead = True
+                if tile[2] == "Assets/diamond.png":
+                    ifWin = True
                 if self.xChange > 0:    # Moving right
                     self.rect.right = tile[1].left
                     self.x = self.rect.x
@@ -92,43 +97,12 @@ class Player():
         self.rect.x = self.x
         self.rect.y = self.y
 
-        return collided
-
-
-
-    # def collision1(self, tileList):
-    #     playerYRect = pg.Rect(self.x, self.y + self.yChange, self.width, self.height)
-    #     playerRightXRect = pg.Rect(self.x + self.xChange, self.y + self.sidePadding, self.width - (self.sidePadding * 2), self.height)
-    #     playerLeftXRect = pg.Rect(self.x - self.xChange, self.y + self.sidePadding, self.width - (self.sidePadding * 2), self.height)
-
-    #     if self.yChange < -22:
-    #         for tile in tileList:
-    #             # if pg.Rect.colliderect(playerYRect, tile[1]):
-    #                 print(pg.Rect.colliderect(playerRightXRect, tile[1]))
-    #                 print(pg.Rect.colliderect(playerYRect, tile[1]))
-    #                 print(self.yChange)
-    #                 print(self.y)
-    #                 print(tile[1])
-    #                 print("")
-
-    #     for tile in tileList:
-    #         if pg.Rect.colliderect(playerRightXRect, tile[1]) | pg.Rect.colliderect(playerLeftXRect, tile[1]):
-    #             self.xChange = 0
-    #         if pg.Rect.colliderect(playerYRect, tile[1]):
-    #             if self.yChange < 0:
-    #                 print("OK")
-    #                 self.y = tile[1].top - self.height
-    #                 self.on_ground = True
-    #                 self.yChange = 0
-    #             elif self.yChange > 0:
-    #                 self.y = tile[1].bottom
-    #                 self.yChange = 0
-    #     return self.on_ground
+        return collided, ifDead, ifWin
     
 
-
-    def move(self, tileList, SCREEN):
-        if not self.collision(tileList, SCREEN):
+    def move(self, tileList):
+        collided, ifDead, ifWin = self.collision(tileList)
+        if not collided:
             self.on_ground = False
 
         if self.xChange != 0:
@@ -137,19 +111,15 @@ class Player():
         self.y += self.yChange
 
         
-
         self.check_walk()
         if not self.on_ground:
             self.yChange += self.gravity
 
-        # print(self.y, self.yChange)
-        # self.jump()
-        # print(self.y, self.yChange)
-
         self.rect.x = self.x
         self.rect.y = self.y
-        
 
+        return ifDead, ifWin
+        
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
