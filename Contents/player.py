@@ -15,6 +15,7 @@ class Player():
         self.jumpPower = jumpPower
 
         self.sidePadding = sidePadding
+        self.jumps_available = 2
 
 
         self.jumping = False
@@ -43,10 +44,16 @@ class Player():
         elif keys[pg.K_RIGHT]:
             self.xChange = self.speed
         
-        if keys[pg.K_UP] and self.on_ground:
-            self.jumping = True
-            self.yChange = self.jumpPower
-            self.on_ground = False
+        if self.on_ground:
+            self.jumps_available = 10
+
+        for event in pg.event.get():
+            if event.type == pg.KEYDOWN and event.key == pg.K_UP:
+                if self.jumps_available > 0:
+                    self.jumping = True
+                    self.yChange = self.jumpPower
+                    self.on_ground = False
+                    self.jumps_available -= 1
     
 
     def collision(self, tileList):

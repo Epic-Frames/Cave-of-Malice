@@ -1,9 +1,9 @@
 import pygame as pg
 import sys
+import json
 from enemy import Enemy
 from text import Text
 from player import Player
-from screen import Screen
 from world import World
 
 pg.init()
@@ -13,11 +13,10 @@ SCREEN_X = 1280
 SCREEN_Y = 720
 SCREEN = pg.display.set_mode((SCREEN_X, SCREEN_Y))
 world = World("Assets/dirt.jpeg", "Assets/lava.jpeg", "Assets/diamond.png", TILE_SIZE)
-screen = Screen(1280, 720)
-pg.display.set_caption("Cave of Malice v0.0.0 - alpha")
+pg.display.set_caption("Cave of Malice v0.2.0 - alpha")
 clock = pg.time.Clock()
 
-player = Player(100, 574, 58, 98, 5, 2, "Assets/player.png", None, 1, -15, 10)
+player = Player(100, 574, 38, 64, 5, 2, "Assets/player.png", None, 0.5, -7.5, 10)
 
 font = pg.font.Font(None, 36)
 startupFont = pg.font.Font(None, 56)
@@ -25,23 +24,47 @@ startupFont = pg.font.Font(None, 56)
 background = pg.image.load("Assets/bg.png")
 background = pg.transform.scale(background, (SCREEN_X, SCREEN_Y))
 
+levelCount = 3
+
 mode = ""
 
-level = screen.load_map("level1.txt")
+levels = [[] for _ in range(levelCount + 1)]
 
 studioText = Text(None, None, "Epic Frame Studio", startupFont, (250, 250, 250), SCREEN_X, SCREEN_Y)
 deathText = Text(None, None, "You died!", font, (0, 0, 0), SCREEN_X, SCREEN_Y)
 winText = Text(None, None, "You Win", font, (0, 0, 0), SCREEN_X, SCREEN_Y)
 
+for i in range(levelCount):
+    levels[i + 1] = world.load_map("level" + str(i + 1) + ".txt")
+    if levels[i + 1] == 0:
+        pg.quit()
+        sys.exit()
+
 currentPage = "start_animation"
+currentLevel = 1
+level = levels[currentLevel]
 
 FPS = 30
 
-enemy1 = Enemy("Spider", 200, 597, 112, 75, 3, 2, "Assets/spider.png", 1)
-
 enemies = []
 
-enemies.append(enemy1)
+# Load json
+try:
+    with open("enemies.json", "r") as json_file:
+        data = json.load(json_file)
+except FileNotFoundError:
+    print("JSON file not found. Quitting...")
+    pg.quit()
+    sys.exit()
+
+def spawn_enemies(level):
+    global enemies
+    enemies = []
+    eflevel = data["levels"][str(level)]
+    for enemyd in eflevel:
+        enemy = Enemy(enemyd["type"], enemyd["init_x"], enemyd["init_y"], enemyd["width"], enemyd["height"], enemyd["speed"], enemyd["health"], enemyd["src_img"], enemyd["dir"])
+        enemies.append(enemy)
+        enemy = None
 
 def draw_button(x, y, width, height, color, text):
     pg.draw.rect(SCREEN, color, (x, y, width, height))
@@ -64,7 +87,7 @@ def start_animation():
                 sys.exit()
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_m:
-                    return "start_page"
+                    return "game"
 
         SCREEN.fill((0, 0, 0))
 
@@ -80,15 +103,19 @@ def start_animation():
         clock.tick(FPS)
 
 def game():
+    global level, currentLevel
     world.load_tiles(level)
     # mode = "Jump"
+    spawn_enemies(currentLevel)
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
                 sys.exit()
-        
-        SCREEN.fill((150, 150, 150))
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_w:
+                    currentLevel += 1
+                    return "game"
         SCREEN.blit(background, (0, 0))
 
         if mode == "Jump":
@@ -99,7 +126,8 @@ def game():
 
         # Move characters
         ifDead, ifWin = player.move(world.tileList)
-        enemy1.move(32, 500)
+        for enemy in enemies:
+            enemy.move(32, 500)
 
         world.draw_map(SCREEN)
 
@@ -109,11 +137,19 @@ def game():
 
         # Display character
         player.draw(SCREEN)
-        enemy1.draw(SCREEN)
+        for enemy in enemies:
+            enemy.draw(SCREEN)
         
         if ifWin | ifDead:
-            if ifWin: 
+            if ifWin:
+                if currentLevel < levelCount:
+                    currentLevel += 1
+                    level = levels[currentLevel]
+                    return "game"
+                currentLevel = 1
+                level = levels[currentLevel]
                 return "win_screen"
+
             else: 
                 return "game_over"
 

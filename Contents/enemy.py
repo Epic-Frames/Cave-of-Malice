@@ -29,18 +29,18 @@ class Enemy():
                 self.direction = -1
 
     
-    def check_alive(self):
-        if self.health <= 0:
-            return False
-        return True
+    # def check_alive(self):
+    #     if self.health <= 0:
+    #         return False
+    #     return True
     
 
-    def clear_enemy(self):
-        self.x = -500
+    # def clear_enemy(self):
+    #     self.x = -500
     
 
-    def take_damage(self, damage):
-        self.health -= damage
+    # def take_damage(self, damage):
+    #     self.health -= damage
     
 
     def draw(self, screen):

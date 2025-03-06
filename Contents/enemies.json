@@ -1,0 +1,22 @@
+{
+    "levels": {
+        "1": [
+            {
+                "id": 1,
+                "type": "Spider",
+                "x1": "32",
+                "x2": "500",
+                "init_x": 200,
+                "init_y": 608,
+                "width": 95,
+                "height": 64,
+                "speed": 3,
+                "health": 2,
+                "src_img": "Assets/spider.png",
+                "dir": 1
+            }
+        ],
+        "2": [],
+        "3": []
+    }
+}
