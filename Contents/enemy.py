@@ -1,7 +1,7 @@
 import pygame as pg
 
 class Enemy():
-    def __init__(self, enemyType, x, y, width, height, speed, health, sourceImage, direction):
+    def __init__(self, enemyType, x, y, width, height, speed, health, sourceImage, direction, num1, num2):
         self.type = enemyType
         self.x = x
         self.y = y
@@ -9,6 +9,13 @@ class Enemy():
         self.height = height
         self.speed = speed
         self.health = health
+
+        if self.type == "Spider":
+            self.x1 = num1
+            self.x2 = num2
+        elif self.type == "Lava Bubbles":
+            self.y1 = num1
+            self.y2 = num2
 
         self.direction = direction
 
@@ -20,12 +27,18 @@ class Enemy():
         self.mask = pg.mask.from_surface(self.image)
 
 
-    def move(self, x1, x2):
+    def move(self):
         if self.type == "Spider":
             self.x += self.speed * self.direction
-            if self.x <= x1:
+            if self.x <= self.x1:
                 self.direction = 1
-            elif self.x >= x2:
+            elif self.x >= self.x2:
+                self.direction = -1
+        elif self.type == "Lava Bubbles":
+            self.y += self.speed * self.direction
+            if self.y <= self.y1:
+                self.direction = 1
+            elif self.y >= self.y2:
                 self.direction = -1
 
     

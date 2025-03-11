@@ -16,7 +16,7 @@ world = World("Assets/dirt.jpeg", "Assets/lava.jpeg", "Assets/diamond.png", TILE
 pg.display.set_caption("Cave of Malice v0.2.0 - alpha")
 clock = pg.time.Clock()
 
-player = Player(100, 574, 38, 64, 5, 2, "Assets/player.png", None, 0.5, -7.5, 10)
+player = Player(100, 574, 28.5, 48, 5, 2, "Assets/player.png", None, 0.5, -6, 10)
 
 font = pg.font.Font(None, 36)
 startupFont = pg.font.Font(None, 56)
@@ -62,7 +62,7 @@ def spawn_enemies(level):
     enemies = []
     eflevel = data["levels"][str(level)]
     for enemyd in eflevel:
-        enemy = Enemy(enemyd["type"], enemyd["init_x"], enemyd["init_y"], enemyd["width"], enemyd["height"], enemyd["speed"], enemyd["health"], enemyd["src_img"], enemyd["dir"])
+        enemy = Enemy(enemyd["type"], enemyd["init_x"], enemyd["init_y"], enemyd["width"], enemyd["height"], enemyd["speed"], enemyd["health"], enemyd["src_img"], enemyd["dir"], enemyd["num1"], enemyd["num2"])
         enemies.append(enemy)
         enemy = None
 
@@ -127,7 +127,7 @@ def game():
         # Move characters
         ifDead, ifWin = player.move(world.tileList)
         for enemy in enemies:
-            enemy.move(32, 500)
+            enemy.move()
 
         world.draw_map(SCREEN)
 

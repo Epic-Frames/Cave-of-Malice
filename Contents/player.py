@@ -45,7 +45,7 @@ class Player():
             self.xChange = self.speed
         
         if self.on_ground:
-            self.jumps_available = 10
+            self.jumps_available = 2
 
         for event in pg.event.get():
             if event.type == pg.KEYDOWN and event.key == pg.K_UP:
