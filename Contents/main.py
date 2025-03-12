@@ -16,6 +16,7 @@ world = World("Assets/dirt.jpeg", "Assets/lava.jpeg", "Assets/diamond.png", TILE
 pg.display.set_caption("Cave of Malice v0.2.0 - alpha")
 clock = pg.time.Clock()
 
+# git test
 player = Player(100, 574, 28.5, 48, 5, 2, "Assets/player.png", None, 0.5, -6, 10)
 
 font = pg.font.Font(None, 36)
